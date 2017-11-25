@@ -1,0 +1,4 @@
+- hosts: [VM1]
+  sudo: yes
+  roles:
+    - nginx
