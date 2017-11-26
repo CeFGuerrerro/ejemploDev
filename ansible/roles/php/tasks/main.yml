@@ -1,0 +1,28 @@
+- name: Instalando interprete PHP
+  apt: >
+    name={{item}}
+    state=present
+  with_items:
+    - php5-fpm
+    - php5-cli
+    - php5-mysql
+    - php5-gd
+    - php5-curl
+    - php5-mcrypt
+
+- name: Habilitar PHP al reiniciar
+  service: >
+    name=php5-fpm
+    state=started
+    enabled=yes
+
+- name: Configurar php.ini
+  ini_file: >
+    dest=/etc/php5/fpm/php.ini
+    section=PHP
+    option="{{ item.option }}"
+    value="{{ item.value }}"
+    backup=yes
+  with_items: "{{ php_ini_settings }}"
+  notify:
+    - restart php
