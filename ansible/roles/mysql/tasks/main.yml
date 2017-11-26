@@ -1,0 +1,32 @@
+- name: Instalando MySQL y dependencias
+  apt: >
+    name={{item}}
+    state=latest
+  with_items:
+    - mysql-server
+    - python-mysqldb
+
+- name: Habilitando MySQL al reiniciar
+  service: >
+    name=mysql
+    state=started
+    enabled=yes
+
+- name: Estableciendo password root
+  mysql_user:
+    user: root
+    host: "{{ item }}"
+    password: "{{ mysql_root_password }}"
+  with_items:
+    - localhost
+    - "{{ ansible_hostname }}"
+    - 127.0.0.1
+    - ::1
+
+- name: Brindar acceso root a MySQL
+  template: 
+    src: .my.cnf.j2
+    dest: /root/.my.cnf
+    owner: root
+    group: root
+    mode: 0600
