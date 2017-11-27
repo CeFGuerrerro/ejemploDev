@@ -1,0 +1,50 @@
+- name: Creando usuario MySQL para drupal
+  mysql_user: >
+    name={{ drupal_db_user }}
+    host={{ item }}
+    priv={{ drupal_db }}.*:ALL
+    password={{drupal_db_password }}
+  with_items:
+    - 127.0.0.1
+    - ::1
+    - localhost
+
+- name: Instalando drush
+  apt: >
+    name={{ item }}
+    state=latest
+  with_items:
+    - drush
+    - sendmail
+
+- name: Configurando settings.php de drupal con drush
+  shell: >
+    drush si standard -y
+    --site-name="{{ drupal_site_name }}"
+    --account-name={{ drupal_admin_name }}
+    --account-pass={{ drupal_admin_pass }}
+    --db-url=mysql://{{ drupal_db_user }}:{{ drupal_db_password }}@localhost/{{ drupal_db }}
+    chdir={{ drupal_path }}
+    creates={{ drupal_path }}/sites/default/settings.php
+
+- name: Agregando host virtual para drupal
+  template: >
+    src=nginx-vhost.conf.j2
+    dest=/etc/nginx/sites-available/nginx-vhost.conf
+    owner=root
+    group=root
+    mode=644
+  notify: reload nginx
+
+- name: Habilitando el sitio y recargando NginX
+  file: >
+    src=/etc/nginx/sites-available/nginx-vhost.conf
+    dest=/etc/nginx/sites-enabled/nginx-vhost.conf
+    state=link
+  notify: reload nginx
+
+- name: Deshabilitando el sitio por defecto de NginX
+  file: >
+    path=/etc/nginx/sites-enabled/default
+    state=absent
+  notify: reload nginx

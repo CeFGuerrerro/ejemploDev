@@ -1,0 +1,27 @@
+server {
+
+	listen 80;
+	server_name dev-drupal.org;
+	root {{ drupal_path }};
+	index index.php;
+
+	location ~ \..*/.*\.php$ {
+		return 403;
+	}
+
+	location / {
+		try_files $uri @rewrite;
+	}
+
+	location @rewrite {
+		rewrite ^/(.*)$ /index.php?q=$1;
+	}
+
+	location ~ \.php$ {
+		fastcgi_split_path_info ^(.+\.php)(/.+)$;
+		include fastcgi_params;
+		fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+		fastcgi_pass 127.0.0.1:9000;
+	}
+
+}

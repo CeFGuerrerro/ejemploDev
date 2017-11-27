@@ -1,0 +1,7 @@
+drupal_db: "our_drupal_db"
+drupal_db_user: "drupal_user"
+drupal_db_password: "drupal_pass"
+drupal_site_name: "our_site_name"
+drupal_admin_name: "admin"
+drupal_admin_pass: "admin"
+drupal_path: "/vagrant/drupal"
