@@ -1,6 +1,6 @@
 php_ini_settings:
   - option: "memory_limit"
-    value: "128M"
+    value: "64M"
   - option: "post_max_size"
     value: "8M"
   - option: "upload_max_filesize"
